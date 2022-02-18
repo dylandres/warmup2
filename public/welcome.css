@@ -1,0 +1,11 @@
+html {
+    background-color: aqua;
+}
+
+label{
+    display: inline-block;
+    float: left;
+    clear: left;
+    width: 70px;
+    text-align: right;
+}
