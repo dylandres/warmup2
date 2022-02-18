@@ -6,9 +6,9 @@
     <body>
         <img src='/gorilla.png'></img>
         <form action="http://localhost:8080/adduser" method="post">
-            <label>E-mail:</label><input type="text" name="email"><br>
-            <label>Username:</label><input type="text" name="username"><br>
-            <label>Password:</label><input type="text" name="password"><br>
+            <label>E-mail:</label><input type="email" name="email" required><br>
+            <label>Username:</label><input type="text" name="username" required><br>
+            <label>Password:</label><input type="password" name="password" required><br>
             <input type="submit" value="Register">
         </form>
         </div>

@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
 const PORT = 8080;
+const api = require('./api.js')
+const mongoose = require('mongoose')
+const uri = 'mongodb+srv://dylandres:hotpink@warmup2.7yfxi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
@@ -10,7 +13,15 @@ app.set('views', 'views')
 
 app.listen(
     PORT,
-    () => console.log(`we out here on port ${PORT}`)
+    () => {
+        console.log(`we out here on port ${PORT}`)
+        // Establish connection with db when server starts
+        mongoose.connect(uri, { useNewUrlParser: true })
+        const connection = mongoose.connection
+        connection.once('open', () => {
+            console.log('database connection established');
+        })
+    }
 )
 
 app.get('/',
@@ -23,7 +34,9 @@ app.post('/adduser',
         var username = req.body.username;
         var password = req.body.password;
         var email = req.body.email;
+        api.addUser(username, password, email);
         res.send(`
+        testing
             username: ${username},
             password: ${password},
             email: ${email}
