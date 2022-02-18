@@ -30,6 +30,7 @@ app.get('/',
         res.render('welcome.ejs')
 })
 
+// User registration
 app.post('/adduser',
     (req, res) => {
         var username = req.body.username;
@@ -42,4 +43,39 @@ app.post('/adduser',
             password: ${password},
             email: ${email}
         `);
+})
+
+// Verifying email (used for grading purposes)
+// ** use Postman to test **
+app.post('/verify',
+    (req, res) => {
+        var email = req.body.email;
+        var key = req.body.key;
+        if (key == "abracadabra") {
+            api.verifyEmail(email);
+            res.send(`
+                ${email} verified!
+            `);
+        }
+        // Wrong key
+        else {
+            res.status(401).send("Wrong key")
+        }
+})
+
+// Optional part, sends an actual verification link to email
+app.get('/verify',
+    (req, res) => {
+        var email = req.query.email
+        var key = req.query.key
+        if (key == "abracadabra") {
+            api.verifyEmail(email);
+            res.send(`
+                ${email} verified!
+            `);
+        }
+        // Wrong key
+        else {
+            res.status(401).send("Wrong key")
+        }
 })

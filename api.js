@@ -5,8 +5,12 @@ async function addUser(username, password, email) {
         username: username,
         password: password,
         email: email,
-        disabled: true
+        verified: false,
     })
 }
 
-module.exports = { addUser }
+async function verifyEmail(email) {
+    await User.findOneAndUpdate({email: email}, {verified: true});
+}
+
+module.exports = { addUser, verifyEmail }
