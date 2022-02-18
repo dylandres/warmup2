@@ -3,7 +3,6 @@ const app = express()
 const PORT = 8080;
 const api = require('./api.js')
 const mongoose = require('mongoose')
-const uri = 'mongodb+srv://dylandres:hotpink@warmup2.7yfxi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
@@ -15,6 +14,8 @@ app.listen(
     PORT,
     () => {
         console.log(`we out here on port ${PORT}`)
+        require('dotenv').config();
+        const uri = process.env.URI;
         // Establish connection with db when server starts
         mongoose.connect(uri, { useNewUrlParser: true })
         const connection = mongoose.connection
