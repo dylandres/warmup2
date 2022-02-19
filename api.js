@@ -1,3 +1,4 @@
+// API function calls to interface with database
 const User = require('./models/user.model.js')
 
 async function addUser(username, password, email) {
