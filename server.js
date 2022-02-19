@@ -38,6 +38,7 @@ app.post('/adduser',
         var password = req.body.password;
         var email = req.body.email;
         api.addUser(username, password, email);
+        // Send a verification email
         let transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             port: 465, // Secure SMTP port
@@ -74,7 +75,7 @@ app.post('/adduser',
         `);
 })
 
-// Verifying email (used for grading purposes)
+// Verifying email through POST (used for grading purposes)
 // ** use Postman to test **
 app.post('/verify',
     (req, res) => {
@@ -92,7 +93,7 @@ app.post('/verify',
         }
 })
 
-// Optional part, sends an actual verification link to email
+// Optional part, verifies using email link
 app.get('/verify',
     (req, res) => {
         var email = req.query.email
