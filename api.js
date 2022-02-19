@@ -9,8 +9,8 @@ async function addUser(username, password, email) {
     })
 }
 
-async function verifyEmail(email) {
+async function verifyUser(email) {
     await User.findOneAndUpdate({email: email}, {verified: true});
 }
 
-module.exports = { addUser, verifyEmail }
+module.exports = { addUser, verifyUser }

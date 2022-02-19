@@ -3,6 +3,7 @@ const app = express()
 const PORT = 8080;
 const api = require('./api.js')
 const mongoose = require('mongoose')
+const nodemailer = require('nodemailer')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true}))
@@ -37,6 +38,34 @@ app.post('/adduser',
         var password = req.body.password;
         var email = req.body.email;
         api.addUser(username, password, email);
+        let transporter = nodemailer.createTransport({
+            host: 'smtp.gmail.com',
+            port: 465, // Secure SMTP port
+            secure: true,
+            auth: {
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS,
+            }
+        })
+        transporter.sendMail({
+            from: '"Hot Pink" <team.hotpink.inc@gmail.com>',
+            to: email,
+            subject: "Verify Email Address for hotpink.com", // Subject line
+            text: `Thanks for registering
+            for an account! 
+            Before we get started, 
+            we just need to confirm 
+            that this is you. Click below to verify your email address: 
+            http://localhost:8080/verify?email=${email}&key=abracadabra`,
+            html: `
+            <body>Thanks for registering
+            for an account! 
+            Before we get started, 
+            we just need to confirm 
+            that this is you.<br><br> Click below to verify your email address:<br><br>
+            <a href="http://localhost:8080/verify?email=${email}&key=abracadabra">
+            Verify</a><br><br>${new Date()}</body>`,
+        })
         res.send(`
         testing
             username: ${username},
@@ -52,7 +81,7 @@ app.post('/verify',
         var email = req.body.email;
         var key = req.body.key;
         if (key == "abracadabra") {
-            api.verifyEmail(email);
+            api.verifyUser(email);
             res.send(`
                 ${email} verified!
             `);
@@ -69,7 +98,7 @@ app.get('/verify',
         var email = req.query.email
         var key = req.query.key
         if (key == "abracadabra") {
-            api.verifyEmail(email);
+            api.verifyUser(email);
             res.send(`
                 ${email} verified!
             `);
