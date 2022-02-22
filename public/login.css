@@ -2,7 +2,7 @@ html {
     background-color: aqua;
 }
 
-label{
+label {
     display: inline-block;
     clear: left;
     width: 70px;

@@ -10,8 +10,8 @@ async function addUser(username, password, email, res) {
     ]}).then( async (user) => {
         // Username or email taken
         if (user) 
-            res.send("Username or email taken")
-        // Create user and put in database
+            res.json({status: "ERROR"})
+        // Otherwise, create user and put in database
         else {
             await User.create({
                 username: username,
@@ -19,8 +19,9 @@ async function addUser(username, password, email, res) {
                 email: email,
                 verified: false,
             })
+            // Send verification link to email
             sendVerificationEmail(email)
-            res.send("registered!")
+            res.json({status: "OK"})
         }
     })
 }
@@ -31,45 +32,49 @@ async function verifyUser(email, key, res) {
         // Check if email exists
         await User.findOne({email: email})
         .then( async (user) => {
+            // Doesn't exist
             if (!user) {
-                res.status(404).send("Email does not exist")
+                res.json({status: "ERROR"})
             }
+            // Exists
             else {
                 // Change verification status
                 await User.findOneAndUpdate({email: email}, {verified: true});
-                res.send(`
-                    ${email} verified!
-                `);
+                res.json({status: "OK"})
             }
         })
 
     }
     // Wrong key
     else {
-        res.status(401).send("Wrong key")
+        res.json({status: "ERROR"})
     }
 }
 
 async function login(username, password, res) {
+    // Verify credentials
     await User.findOne({$and: [
         {username: username},
         {password: password},
     ]}).then( (user) => {
+        // Wrong credentials
         if (!user)
-            res.status(401).send("Incorrect credentials")
+            res.json({status: "ERROR"})
         else {
+            // Check if user is verified
             if (user.verified) {
-                res.send(`Logged in as ${username}`)
+                // res.json({status: "OK"}) do we need this?
+                res.render("game.ejs", {username: username})
             }
             else {
-                res.status(403).send("This user has not been verified")
+                res.json({status: "ERROR"})
             }
         }
     })
 }
 
 function sendVerificationEmail(email) {
-     // User added to database, send a verification email
+     // Create transporter object
      let transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465, // Secure SMTP port
@@ -79,6 +84,7 @@ function sendVerificationEmail(email) {
             pass: process.env.MAIL_PASS,
         }
     })
+    // Send email
     transporter.sendMail({
         from: '"Hot Pink" <team.hotpink.inc@gmail.com>',
         to: email,
