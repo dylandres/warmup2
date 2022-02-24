@@ -63,13 +63,10 @@ async function login(username, password, res) {
         }
         else {
             // Check if user is verified
-            if (user.verified) {
-                console.log("good")
+            if (user.verified)
                 res.json({status: "OK"})
-            }
-            else {
+            else
                 res.json({status: "ERROR"})
-            }
         }
     })
 }

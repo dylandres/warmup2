@@ -7,7 +7,7 @@
     <body>
         <div id="greeting">Welcome!</div>
         <img src='/gorilla.png'></img>
-        <form action="http://localhost:8080/adduser" method="post">
+        <form id="register" onsubmit="return false">
             <label>E-mail:</label><input type="email" name="email" required><br>
             <label>Username:</label><input type="text" name="username" required><br>
             <label>Password:</label><input type="password" name="password" required><br>
