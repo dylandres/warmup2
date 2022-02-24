@@ -58,13 +58,14 @@ async function login(username, password, res) {
         {password: password},
     ]}).then( (user) => {
         // Wrong credentials
-        if (!user)
+        if (!user) {
             res.json({status: "ERROR"})
+        }
         else {
             // Check if user is verified
             if (user.verified) {
-                // res.json({status: "OK"}) do we need this?
-                res.render("game.ejs", {username: username})
+                console.log("good")
+                res.json({status: "OK"})
             }
             else {
                 res.json({status: "ERROR"})

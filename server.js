@@ -70,3 +70,10 @@ app.post('/login',
         var password = req.body.password
         api.login(username, password, res)
 })
+
+app.get('/game/:username',
+    (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var username = req.params.username;
+        res.render('game.ejs', {username: username})
+})
