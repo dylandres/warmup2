@@ -1,3 +1,4 @@
+// Client-side JS for login.ejs
 // Load event-listener
 window.addEventListener("load", function() {
     // Login button event-listener
@@ -28,7 +29,7 @@ function authenticateLogin(form) {
             var json = JSON.parse(xhr.responseText);
             // Logged in, redirect to game page
             if (json['status'] == 'OK')
-                window.location.assign(`http://localhost:8080/game/${username}`);
+                window.location.assign(`http://localhost:8080/game`);
             else
                 document.getElementById("greeting").innerHTML = "Incorrect username or password"
         }

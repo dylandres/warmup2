@@ -51,7 +51,7 @@ async function verifyUser(email, key, res) {
     }
 }
 
-async function login(username, password, res) {
+async function login(username, password, req, res) {
     // Verify credentials
     await User.findOne({$and: [
         {username: username},
@@ -63,11 +63,26 @@ async function login(username, password, res) {
         }
         else {
             // Check if user is verified
-            if (user.verified)
+            if (user.verified) {
+                // Associate session with user
+                req.session.userID = user.id;
+                // Allow user to access /game
+                req.session.isAuth = true;
                 res.json({status: "OK"})
+            }
             else
                 res.json({status: "ERROR"})
         }
+    })
+}
+
+function logout(req, res) {
+    // Destroy session
+    req.session.destroy((err) => {
+        if (err)
+            res.json({status: "ERROR"})
+        else
+            res.json({status: "OK"})
     })
 }
 
@@ -100,4 +115,4 @@ function sendVerificationEmail(email) {
     })
 }
 
-module.exports = { addUser, verifyUser, login }
+module.exports = { addUser, verifyUser, login, logout }

@@ -1,5 +1,5 @@
 html {
-    background-color: aqua;
+    background-color: rgb(255, 16, 240);
 }
 
 label {
@@ -7,4 +7,8 @@ label {
     clear: left;
     width: 70px;
     text-align: right;
+}
+
+input, img {
+    border-radius: 5px;
 }

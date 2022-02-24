@@ -3,6 +3,9 @@ const app = express()
 const PORT = 8080;
 const api = require('./api.js')
 const mongoose = require('mongoose')
+const session = require('express-session');
+const User = require('./models/user.model.js');
+const MongoDBSession = require('connect-mongodb-session')(session)
 
 // Middleware
 app.use(express.json())
@@ -10,28 +13,57 @@ app.use(express.urlencoded({ extended: true}))
 app.use(express.static('public'))
 app.set('view engine', 'ejs')
 app.set('views', 'views')
+require('dotenv').config();
+
+// Connect to MongoDB
+const uri = process.env.URI;
+mongoose.connect(uri, {useNewUrlParser: true})
+const connection = mongoose.connection
+connection.once('open', () => {
+    console.log('Database connection established!');
+})
+
+// Session/Cookie stuff
+const store = new MongoDBSession({
+    uri: process.env.URI,
+    collection: 'sessions',
+})
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+}))
+
+// Middleware to protect /game path
+// Must be logged in to access
+const isAuth = (req, res, next) => {
+    if (req.session.isAuth) 
+        next()
+    else
+        res.redirect('/')
+}
 
 // Start server
 app.listen(
     PORT,
     () => {
         console.log(`Server started on port ${PORT}`)
-        require('dotenv').config();
-        const uri = process.env.URI;
-        // Establish connection with db when server starts
-        mongoose.connect(uri, { useNewUrlParser: true })
-        const connection = mongoose.connection
-        connection.once('open', () => {
-            console.log('Database connection established!');
-        })
     }
 )
 
 // Login screen
 app.get('/',
-    (req, res) => {
+    async (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        res.render('login.ejs')
+        // Check if session exists
+        var user = await User.findOne({_id: req.session.userID})
+        // Session exists, auto-login
+        if (user)
+            res.redirect('/game')
+        // Session doesn't exist
+        else
+            res.render('login.ejs')
 })
 
 // User registration
@@ -63,17 +95,23 @@ app.get('/verify',
         api.verifyUser(email, key, res)
 })
 
+// Tic-Tac-Toe
+app.get('/game', isAuth,
+    (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        res.render('game.ejs')
+})
+
 app.post('/login',
     (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
         var username = req.body.username
         var password = req.body.password
-        api.login(username, password, res)
+        api.login(username, password, req, res)
 })
 
-app.get('/game/:username',
+app.post('/logout',
     (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        var username = req.params.username;
-        res.render('game.ejs', {username: username})
+        api.logout(req, res)
 })
