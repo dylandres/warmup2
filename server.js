@@ -56,12 +56,12 @@ app.listen(
 app.get('/',
     async (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        // Check if session exists
+        // Check if there's a user with this session ID
         var user = await User.findOne({_id: req.session.userID})
-        // Session exists, auto-login
+        // User exists, auto-login
         if (user)
             res.redirect('/game')
-        // Session doesn't exist
+        // User doesn't exist
         else
             res.render('login.ejs')
 })

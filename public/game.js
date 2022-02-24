@@ -13,8 +13,10 @@ window.addEventListener("load", function() {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 // Read JSON response
-                // Redirect to login
-                window.location.assign(`http://localhost:8080/`);
+                var json = JSON.parse(xhr.responseText);
+                // Registration successful
+                if (json['status'] == 'OK')
+                    window.location.assign(`http://localhost:8080/`);
             }
         }
     });

@@ -76,14 +76,20 @@ async function login(username, password, req, res) {
     })
 }
 
-function logout(req, res) {
-    // Destroy session
-    req.session.destroy((err) => {
-        if (err)
-            res.json({status: "ERROR"})
-        else
-            res.json({status: "OK"})
-    })
+async function logout(req, res) {
+    var user = await User.findOne({_id: req.session.userID})
+    // User not logged in
+    if (!user)
+        res.json({status: "ERROR"})
+    else {
+        // Destroy session
+        req.session.destroy((err) => {
+            if (err)
+                res.json({status: "ERROR"})
+            else
+                res.json({status: "OK"})
+        })
+    }
 }
 
 function sendVerificationEmail(email) {
