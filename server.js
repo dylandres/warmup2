@@ -118,6 +118,7 @@ app.get('/dashboard', isAuth,
 app.get('/ttt/play', isAuth,
     (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        res.set('user', req.session.userID);
         res.render('tictactoe.ejs')
 })
 
