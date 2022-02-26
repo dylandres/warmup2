@@ -29,7 +29,7 @@ function authenticateLogin(form) {
             var json = JSON.parse(xhr.responseText);
             // Logged in, redirect to game page
             if (json['status'] == 'OK')
-                window.location.assign(`http://localhost:8080/game`);
+                window.location.assign(`http://localhost:8080/dashboard`);
             else
                 document.getElementById("greeting").innerHTML = "Incorrect username or password"
         }

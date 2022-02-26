@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const PORT = 8080;
 const api = require('./api.js')
+const algos = require('./algos.js')
 const mongoose = require('mongoose')
 const session = require('express-session');
 const User = require('./models/user.model.js');
@@ -35,8 +36,7 @@ app.use(session({
     store: store,
 }))
 
-// Middleware to protect /game path
-// Must be logged in to access
+// Middleware to protect paths that require login/authentication
 const isAuth = (req, res, next) => {
     if (req.session.isAuth) 
         next()
@@ -60,7 +60,7 @@ app.get('/',
         var user = await User.findOne({_id: req.session.userID})
         // User exists, auto-login
         if (user)
-            res.redirect('/game')
+            res.redirect('/dashboard')
         // User doesn't exist
         else
             res.render('login.ejs')
@@ -95,13 +95,6 @@ app.get('/verify',
         api.verifyUser(email, key, res)
 })
 
-// Tic-Tac-Toe
-app.get('/game', isAuth,
-    (req, res) => {
-        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        res.render('game.ejs')
-})
-
 app.post('/login',
     (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
@@ -115,3 +108,37 @@ app.post('/logout',
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
         api.logout(req, res)
 })
+
+app.get('/dashboard', isAuth,
+    (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        res.render('dashboard.ejs')
+})
+
+app.get('/ttt/play', isAuth,
+    (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        res.render('tictactoe.ejs')
+})
+
+app.post('/ttt/play',
+    (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var grid = req.body.grid;
+        // Check if X won
+        if (algos.checkWinner(grid, 'X'))
+            res.send(JSON.stringify({'grid': grid, 'winner': 'X'}))
+        // If not, Check for tie
+        else if (algos.checkTie(grid))
+            res.send(JSON.stringify({'grid': grid, 'winner': 'T'}))
+        // If not, place an O
+        else {
+            grid = algos.botsMove(grid)
+            // Check if bot won
+            if (algos.checkWinner(grid, 'O'))
+                res.send(JSON.stringify({'grid': grid, 'winner': 'O'}))
+            // Otherwise, keep playing
+            else
+            res.send(JSON.stringify({'grid': grid, 'winner': ' '}))      
+        }
+    });

@@ -1,0 +1,21 @@
+html {
+    background-color: aqua;
+  }
+  
+  .board {
+    display: grid;
+    grid-gap: 1px;
+    grid-template-columns: repeat(3, 90px);
+    grid-template-rows: repeat(3, 90px);
+  }
+  /* select child (box) */
+  button {
+    background-color: lightblue;
+    font-size: 60px;
+    text-align: center;
+  }
+  
+  button:hover {
+    background-color: rgb(0, 139, 116);
+  }
+  

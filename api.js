@@ -66,7 +66,7 @@ async function login(username, password, req, res) {
             if (user.verified) {
                 // Associate session with user
                 req.session.userID = user.id;
-                // Allow user to access /game
+                // Allow user to access /dashboard
                 req.session.isAuth = true;
                 res.json({status: "OK"})
             }
