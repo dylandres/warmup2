@@ -130,7 +130,7 @@ app.post('/ttt/play', isAuth,
         // Get move from human
         var move = req.body.move;
         // Get this game from the database
-        var game_id = req.get("game_id")
+        var game_id = req.get("gameid")
         var game = await api.getGameById(game_id)
         var grid = game.grid
         // "Making a request with { move:null } should return the current grid without making a move"

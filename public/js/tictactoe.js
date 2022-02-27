@@ -53,7 +53,7 @@ const send_move_to_server = (move) => {
     xhr.setRequestHeader("Content-Type", "application/json");
     // POST to server
     var payload = JSON.stringify({'move': move});
-    xhr.setRequestHeader("game_id", game_id)
+    xhr.setRequestHeader("gameid", game_id)
     xhr.send(payload);
     // Receive response from server
     xhr.onreadystatechange = function () {
