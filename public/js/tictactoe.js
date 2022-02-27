@@ -1,61 +1,114 @@
-var grid = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
+// Client-side JS for tictactoe.js
+// Get the user_id of the user currently logged in
+var xhr = new XMLHttpRequest();
+xhr.open('GET', document.location, false);
+xhr.send(null);
+var user_id = xhr.getResponseHeader('user');
 
-// Modifying front-end from user clicks
-const clicked = (id) => {
-    // Put an X in the box
-    document.getElementById(id).innerHTML = 'X';
-    // Disable the button
-    document.getElementById(id).disabled = true;
-    // Modify grid
-    grid[id] = 'X';
-    // Bot's turn
-    send_move_to_server();
+// Start by checking if an unfinished game for this user exists, if so resume
+var grid;
+var game_id;
+xhr = new XMLHttpRequest();
+xhr.open("GET", `http://localhost:8080/ttt/check_if_game_exists/${user_id}`, true);
+xhr.send(null);
+xhr.onreadystatechange = function () {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+        var json = JSON.parse(xhr.responseText);
+        grid = json['grid']
+        // Game exists, fill in boxes and set game_id
+        if (grid) {
+            game_id = json['game_id']
+            for (var i = 0; i < 9; i++) {
+                if (grid[i] == 'X') {
+                    document.getElementById(i).innerHTML = 'X';
+                    document.getElementById(i).disabled = true;
+                }
+                else if (grid[i] == 'O') {
+                    document.getElementById(i).innerHTML = 'O';
+                    document.getElementById(i).disabled = true;
+                }
+            }
+        }
+        // Redundant but just to be explicit
+        // Game doesn't exist, new game_id will have been created
+        else {
+            game_id = json['game_id']
+        }
+    }
+}
+
+
+// Fired when user clicks a box
+const clicked = (square) => {
+    // Send move to bot
+    send_move_to_server(square);
 }
 
 // Sending JSON to server
-const send_move_to_server = () => {
+const send_move_to_server = (move) => {
     // Prepare JSON
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "http://localhost:8080/ttt/play", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     // POST to server
-    var payload = JSON.stringify({'grid': grid});
+    var payload = JSON.stringify({'move': move});
+    xhr.setRequestHeader("game_id", game_id)
     xhr.send(payload);
-    // receive response from server
+    // Receive response from server
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var json = JSON.parse(xhr.responseText);
-            var bots_move = json['grid']
+            grid = json['grid']
+            console.log(grid)
+            for (var i = 0; i < 9; i++) {
+                if (grid[i] == 'X') {
+                    document.getElementById(i).innerHTML = 'X';
+                    document.getElementById(i).disabled = true;
+                }
+                else if (grid[i] == 'O') {
+                    document.getElementById(i).innerHTML = 'O';
+                    document.getElementById(i).disabled = true;
+                }
+            }
             var winner = json['winner']
-            place_bots_move(bots_move);
             // Someone won/tie
-            if (winner != ' ') {
+            if (winner != 'none') {
                 // Tie
                 if (winner == 'T')
-                    document.getElementById('display').innerHTML = 'Tie xdd';
+                    document.getElementById('display').innerHTML = 'Tie!';
                 // Win
                 else {
-                    document.getElementById('display').innerHTML = `${winner} wins!!`
+                    document.getElementById('display').innerHTML = `${winner} wins!`
                 }
-                // Disable all buttons
-                for (i = 0; i < 9; i++)
+                // Disable buttons
+                for (var i = 0; i < 9; i++) {
                     document.getElementById(i).disabled = true;
+                }
+                // Wait 1 second to display winner, then reset
+                setTimeout(function() {
+                    resetGame()
+                }, 1000)
             }
-            // Keep playing
-            else {
-                grid = bots_move;
-            };
         }
     }
 }
 
-// Find the bots move, put O in the proper box for front-end
-const place_bots_move = (bots_move) => {
-    for (i = 0; i < 9; i++) {
-        if (grid[i] != bots_move[i]) {
-            document.getElementById(i).innerHTML = 'O';
-            document.getElementById(i).disabled = true;
-            break
+const resetGame = () => {
+    // Create a new game
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", `http://localhost:8080/ttt/create_new_game/${user_id}`, true);
+    xhr.send(null);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var json = JSON.parse(xhr.responseText);
+            grid = json['grid']
+            game_id = json['game_id']
+            // Reset the board
+            for (var i = 0; i < 9; i++) {
+                document.getElementById(i).innerHTML = ''; 
+                document.getElementById(i).disabled = false;
+            }
+            document.getElementById('display').innerHTML = 'Welcome to Tic-Tac-Toe!';
         }
     }
 }

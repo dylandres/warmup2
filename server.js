@@ -1,8 +1,8 @@
 const express = require('express')
 const app = express()
 const PORT = 8080;
-const api = require('./api.js')
-const algos = require('./algos.js')
+const api = require('./public/js/api.js')
+const algos = require('./public/js/algos.js')
 const mongoose = require('mongoose')
 const session = require('express-session');
 const User = require('./models/user.model.js');
@@ -115,6 +115,7 @@ app.get('/dashboard', isAuth,
         res.render('dashboard.ejs')
 })
 
+// For getting to tic-tac-toe game page
 app.get('/ttt/play', isAuth,
     (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
@@ -122,24 +123,113 @@ app.get('/ttt/play', isAuth,
         res.render('tictactoe.ejs')
 })
 
+// Used to submit move to 'bot'
 app.post('/ttt/play',
-    (req, res) => {
+    async (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        var grid = req.body.grid;
+        // Get move from human
+        var move = req.body.move;
+        // Get this game from the database
+        var game_id = req.get("game_id")
+        var game = await api.getGameById(game_id)
+        var grid = game.grid
+        // "Making a request with { move:null } should return the current grid without making a move"
+        if (move == null)
+            res.send(JSON.stringify({'grid': grid, 'winner': game.winner}))
+        // Make the human's move
+        grid[move] = 'X'
         // Check if X won
-        if (algos.checkWinner(grid, 'X'))
+        if (algos.checkWinner(grid, 'X')) {
+            // Update database with gamedata
+            await api.editGame(game_id, grid, 'X')
             res.send(JSON.stringify({'grid': grid, 'winner': 'X'}))
+        }
         // If not, Check for tie
-        else if (algos.checkTie(grid))
+        else if (algos.checkTie(grid)) {
+            await api.editGame(game_id, grid, 'T')
             res.send(JSON.stringify({'grid': grid, 'winner': 'T'}))
+        }
         // If not, place an O
         else {
             grid = algos.botsMove(grid)
             // Check if bot won
-            if (algos.checkWinner(grid, 'O'))
+            if (algos.checkWinner(grid, 'O')) {
+                await api.editGame(game_id, grid, 'O')
                 res.send(JSON.stringify({'grid': grid, 'winner': 'O'}))
+            }
             // Otherwise, keep playing
-            else
-            res.send(JSON.stringify({'grid': grid, 'winner': ' '}))      
+            else {
+                await api.editGame(game_id, grid, 'none')  
+                res.send(JSON.stringify({'grid': grid, 'winner': 'none'}))
+            }    
         }
-    });
+})
+
+// Used by browser to query database for an unfinished game, returns grid
+app.get('/ttt/check_if_game_exists/:id',
+    async (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var user_id = req.params.id
+        const game = await api.checkIfGameExists(user_id)
+        // Game exists, return grid and game_id
+        if (game)
+            res.json({grid: game.grid,
+                      game_id: game._id.toString()
+                    })
+        // Game doesn't exist, create a new game in the database
+        else {
+            var new_game = await api.createNewGame(user_id);
+            res.json({grid: [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+                      game_id: new_game._id.toString()
+                    })
+        }
+})
+
+// Used by browser to create a new game when a previous game has finished
+app.get('/ttt/create_new_game/:id', 
+    async (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var user_id = req.params.id
+        var new_game = await api.createNewGame(user_id)
+        res.json({grid: new_game.grid,
+                  game_id: new_game._id.toString()
+                })
+})
+
+app.post('/listgames', isAuth,
+    async (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var allGames = await api.getAllGames();
+        games = []
+        allGames.forEach(game => games.push({'id': game._id.toString(),
+                                             'start_date': game.start_date}))
+        res.json({status: "OK", games: games})
+})
+
+app.post('/getgame', isAuth,
+    async (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var id = req.body.id;
+        var game = await api.getGameById(id)
+        res.json({status: "OK", grid: game.grid, winner: game.winner})
+})
+
+app.post('/getscore', isAuth,
+    async (req, res) => {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        var allGames = await api.getAllGames();
+        var stats = {"human": 0, "wopr": 0, "tie": 0}
+        allGames.forEach(game => {
+            if (game.winner == 'X')
+                stats["human"] += 1
+            else if (game.winner == 'O')
+                stats["wopr"] += 1
+            else if (game.winner == 'T')
+                stats["tie"] += 1
+        })
+        res.json({status: "OK",
+                  human: stats["human"],
+                  wopr: stats["wopr"],
+                  tie: stats["tie"]
+                })
+})

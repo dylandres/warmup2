@@ -1,5 +1,6 @@
 // API function calls
-const User = require('./models/user.model.js')
+const User = require('../../models/user.model.js')
+const Game = require('../../models/game.model.js')
 const nodemailer = require('nodemailer')
 
 async function addUser(username, password, email, res) {
@@ -121,4 +122,48 @@ function sendVerificationEmail(email) {
     })
 }
 
-module.exports = { addUser, verifyUser, login, logout }
+// Find unfinished game with this id, return the grid
+async function checkIfGameExists(user_id) {
+    const game = await Game.findOne({$and: [
+        {user_id: user_id},
+        {winner: "none"}
+        ]})
+    // Game exists
+    if (game)
+        return game
+    // Game doesn't exist
+    else
+        return null
+}
+
+async function createNewGame(user_id) {
+    const game = await Game.create({
+        user_id: user_id,
+        start_date: new Date(),
+        grid: [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+        winner: "none",
+    })
+    return game
+}
+
+async function getGameById(id) {
+    const game = await Game.findOne({
+        _id: id
+    })
+    return game
+}
+
+async function editGame(game_id, grid, winner) {
+    await Game.findByIdAndUpdate(game_id, {
+        grid: grid,
+        winner: winner
+    })
+}
+
+async function getAllGames() {
+    const games = await Game.find({})
+    return games
+}
+
+module.exports = { addUser, verifyUser, login, logout, checkIfGameExists,
+     createNewGame, getGameById, editGame, getAllGames }

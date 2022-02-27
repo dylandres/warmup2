@@ -1,4 +1,4 @@
-// Client-side JS for game.ejs
+// Client-side JS for dashboard.ejs
 // Load event-listener
 window.addEventListener("load", function() {
     // Logout button event-listener
