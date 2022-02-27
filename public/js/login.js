@@ -19,7 +19,7 @@ function authenticateLogin(form) {
     var password = form.password.value;
     // Send an AJAX POST to /login
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8080/login", true);
+    xhr.open("POST", "http://hotpink.cse356.compas.cs.stonybrook.edu/login", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     var payload = JSON.stringify({'username': username, 'password': password})
     xhr.send(payload)
@@ -43,7 +43,7 @@ function attemptRegistration(form) {
     var password = form.password.value;
     // Send an AJAX POST to /adduser
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8080/adduser", true);
+    xhr.open("POST", "http://hotpink.cse356.compas.cs.stonybrook.edu/adduser", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     var payload = JSON.stringify({'email': email, 'username': username, 'password': password})
     xhr.send(payload)

@@ -6,7 +6,7 @@ window.addEventListener("load", function() {
     logoutForm.addEventListener("submit", function() {
         // Send an AJAX POST to /logout
         var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:8080/logout", true);
+        xhr.open("POST", "http://hotpink.cse356.compas.cs.stonybrook.edu/logout", true);
         xhr.setRequestHeader("Content-Type", "application/json");
         var payload = JSON.stringify({})
         xhr.send(payload)
