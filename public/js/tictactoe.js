@@ -9,7 +9,7 @@ var user_id = xhr.getResponseHeader('user');
 var grid;
 var game_id;
 xhr = new XMLHttpRequest();
-xhr.open("GET", `http://localhost:8080/ttt/check_if_game_exists/${user_id}`, true);
+xhr.open("GET", `http://hotpink.cse356.compas.cs.stonybrook.edu/ttt/check_if_game_exists/${user_id}`, true);
 xhr.send(null);
 xhr.onreadystatechange = function () {
     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -33,6 +33,7 @@ xhr.onreadystatechange = function () {
         // Game doesn't exist, new game_id will have been created
         else {
             game_id = json['game_id']
+            grid = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
         }
     }
 }
@@ -48,7 +49,7 @@ const clicked = (square) => {
 const send_move_to_server = (move) => {
     // Prepare JSON
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:8080/ttt/play", true);
+    xhr.open("POST", "http://hotpink.cse356.compas.cs.stonybrook.edu/ttt/play", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     // POST to server
     var payload = JSON.stringify({'move': move});
@@ -59,7 +60,7 @@ const send_move_to_server = (move) => {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var json = JSON.parse(xhr.responseText);
             grid = json['grid']
-            console.log(grid)
+            // Update board with human and bot's moves
             for (var i = 0; i < 9; i++) {
                 if (grid[i] == 'X') {
                     document.getElementById(i).innerHTML = 'X';
@@ -84,8 +85,9 @@ const send_move_to_server = (move) => {
                 for (var i = 0; i < 9; i++) {
                     document.getElementById(i).disabled = true;
                 }
-                // Wait 1 second to display winner, then reset
+                // Wait 1 second to display winner
                 setTimeout(function() {
+                    // then reset
                     resetGame()
                 }, 1000)
             }
@@ -96,11 +98,12 @@ const send_move_to_server = (move) => {
 const resetGame = () => {
     // Create a new game
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", `http://localhost:8080/ttt/create_new_game/${user_id}`, true);
+    xhr.open("GET", `http://hotpink.cse356.compas.cs.stonybrook.edu/ttt/create_new_game/${user_id}`, true);
     xhr.send(null);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var json = JSON.parse(xhr.responseText);
+            // New grid and game_id
             grid = json['grid']
             game_id = json['game_id']
             // Reset the board

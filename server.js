@@ -124,7 +124,7 @@ app.get('/ttt/play', isAuth,
 })
 
 // Used to submit move to 'bot'
-app.post('/ttt/play',
+app.post('/ttt/play', isAuth,
     async (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
         // Get move from human

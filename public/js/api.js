@@ -114,7 +114,7 @@ function sendVerificationEmail(email) {
         Thanks for registering for an account! Before we get started, 
         we just need to confirm that this is you. <br><br>
         Click below to verify your email address: <br><br>
-        <a href="http://localhost:8080/verify?email=${email}&key=abracadabra">
+        <a href="http://hotpink.cse356.compas.cs.stonybrook.edu/verify?email=${email}&key=abracadabra">
         Verify</a><br><br>
         ${new Date()}
         </body>
