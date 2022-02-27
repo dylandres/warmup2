@@ -199,7 +199,7 @@ app.get('/ttt/create_new_game/:id',
 app.post('/listgames', isAuth,
     async (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        var allGames = await api.getAllGames();
+        var allGames = await api.getAllGames(req.session.userID);
         games = []
         allGames.forEach(game => games.push({'id': game._id.toString(),
                                              'start_date': game.start_date}))
@@ -217,7 +217,7 @@ app.post('/getgame', isAuth,
 app.post('/getscore', isAuth,
     async (req, res) => {
         res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
-        var allGames = await api.getAllGames();
+        var allGames = await api.getAllGames(req.session.userID);
         var stats = {"human": 0, "wopr": 0, "tie": 0}
         allGames.forEach(game => {
             if (game.winner == 'X')

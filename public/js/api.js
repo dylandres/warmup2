@@ -160,10 +160,13 @@ async function editGame(game_id, grid, winner) {
     })
 }
 
-async function getAllGames() {
-    const games = await Game.find({})
+async function getAllGames(id) {
+    const games = await Game.find({
+        user_id: id
+    })
     return games
 }
+
 
 module.exports = { addUser, verifyUser, login, logout, checkIfGameExists,
      createNewGame, getGameById, editGame, getAllGames }
