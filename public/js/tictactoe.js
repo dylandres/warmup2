@@ -9,7 +9,7 @@ var user_id = xhr.getResponseHeader('user');
 var grid;
 var game_id;
 xhr = new XMLHttpRequest();
-xhr.open("GET", `http://hotpink.cse356.compas.cs.stonybrook.edu/ttt/check_if_game_exists/${user_id}`, true);
+xhr.open("GET", `http://localhost:8080/ttt/check_if_game_exists/${user_id}`, true);
 xhr.send(null);
 xhr.onreadystatechange = function () {
     if (xhr.readyState === 4 && xhr.status === 200) {
@@ -49,7 +49,7 @@ const clicked = (square) => {
 const send_move_to_server = (move) => {
     // Prepare JSON
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://hotpink.cse356.compas.cs.stonybrook.edu/ttt/play", true);
+    xhr.open("POST", "http://localhost:8080/ttt/play", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     // POST to server
     var payload = JSON.stringify({'move': move});
@@ -98,7 +98,7 @@ const send_move_to_server = (move) => {
 const resetGame = () => {
     // Create a new game
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", `http://hotpink.cse356.compas.cs.stonybrook.edu/ttt/create_new_game/${user_id}`, true);
+    xhr.open("GET", `http://localhost:8080/ttt/create_new_game/${user_id}`, true);
     xhr.send(null);
     xhr.onreadystatechange = function () {
         if (xhr.readyState === 4 && xhr.status === 200) {
