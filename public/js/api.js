@@ -126,7 +126,7 @@ function sendVerificationEmail(email) {
 async function checkIfGameExists(user_id) {
     const game = await Game.findOne({$and: [
         {user_id: user_id},
-        {winner: ""}
+        {winner: " "}
         ]})
     // Game exists
     if (game)
@@ -141,7 +141,7 @@ async function createNewGame(user_id) {
         user_id: user_id,
         start_date: new Date(),
         grid: [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        winner: "",
+        winner: " ",
     })
     return game
 }

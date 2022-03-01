@@ -159,8 +159,8 @@ app.post('/ttt/play', isAuth,
             }
             // Otherwise, keep playing
             else {
-                await api.editGame(game_id, grid, '')  
-                res.send(JSON.stringify({'grid': grid, 'winner': ''}))
+                await api.editGame(game_id, grid, ' ')  
+                res.send(JSON.stringify({'grid': grid, 'winner': ' '}))
             }    
         }
 })

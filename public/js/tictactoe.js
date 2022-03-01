@@ -73,7 +73,7 @@ const send_move_to_server = (move) => {
             }
             var winner = json['winner']
             // Someone won/tie
-            if (winner != '') {
+            if (winner != ' ') {
                 // Tie
                 if (winner == 'T')
                     document.getElementById('display').innerHTML = 'Tie!';
