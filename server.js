@@ -40,8 +40,10 @@ app.use(session({
 const isAuth = (req, res, next) => {
     if (req.session.isAuth) 
         next()
-    else
-        res.redirect('/')
+    else {
+        res.set('X-CSE356', '61fac4e6c3ba403a360580f3')
+        res.json({status: "ERROR"})
+    }
 }
 
 // Start server
